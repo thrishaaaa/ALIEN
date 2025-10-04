@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -241,12 +241,16 @@
             transform: none;
         }
 
-        /* Loading and Status */
-        .status-message {
+        /* Welcome Message */
+        .welcome-message {
             text-align: center;
-            padding: 1rem;
+            padding: 2rem;
             color: #666;
-            font-style: italic;
+        }
+
+        .welcome-message h2 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
         }
 
         /* Responsive */
@@ -308,16 +312,17 @@
         <!-- Sidebar - Members List -->
         <div class="sidebar">
             <h3 class="sidebar-title">Online Members (<span id="memberCount">0</span>)</h3>
-            <ul class="member-list" id="memberList">
-                <li class="status-message">Loading members...</li>
-            </ul>
+            <ul class="member-list" id="memberList"></ul>
         </div>
 
         <!-- Chat Area -->
         <div class="chat-area">
             <!-- Chat Window -->
             <div class="chat-window" id="chatWindow">
-                <div class="status-message">Loading messages...</div>
+                <div class="welcome-message">
+                    <h2>Welcome to Tech Career Community! 👋</h2>
+                    <p>Start chatting with the community below.</p>
+                </div>
             </div>
 
             <!-- Message Input -->
@@ -328,28 +333,56 @@
                     class="message-input" 
                     placeholder="Type your message..."
                     maxlength="500"
-                    onkeypress="handleKeyPress(event)"
                 />
-                <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+                <button class="send-btn" id="sendBtn">Send</button>
             </div>
         </div>
     </div>
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        // Configuration
-        const API_BASE_URL = /*[[@{/api}]]*/ '/api';
-        const WS_URL = /*[[@{/ws}]]*/ 'ws://localhost:8080/ws';
-        
-        // User info
-        let userId = localStorage.getItem('userId') || 'user_' + Math.random().toString(36).substr(2, 9);
-        let username = localStorage.getItem('username') || 'User_' + userId.substr(-4);
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('username', username);
+    <script>
+        // User info - stored in memory
+        let currentUser = {
+            id: 'user_' + Math.random().toString(36).substr(2, 9),
+            name: 'User_' + Math.floor(Math.random() * 1000)
+        };
 
-        // WebSocket connection
-        let stompClient = null;
-        let isConnected = false;
+        // Sample online members
+        const onlineMembers = [
+            { id: 1, name: 'SarahK' },
+            { id: 2, name: 'Dev_Ops_Max' },
+            { id: 3, name: 'NewGrad2025' },
+            { id: 4, name: 'CodeNinja' },
+            { id: 5, name: 'TechGuru88' },
+            { id: 6, name: currentUser.name }
+        ];
+
+        // Sample initial messages
+        const initialMessages = [
+            {
+                id: 1,
+                author: 'SarahK',
+                userId: 'user_sarah',
+                text: 'Anyone else applying for the new SWE role at Innovatech?',
+                timestamp: new Date(Date.now() - 300000) // 5 minutes ago
+            },
+            {
+                id: 2,
+                author: 'Dev_Ops_Max',
+                userId: 'user_max',
+                text: 'Just finished my AWS Solutions Architect certification! 🎉',
+                timestamp: new Date(Date.now() - 240000) // 4 minutes ago
+            },
+            {
+                id: 3,
+                author: 'NewGrad2025',
+                userId: 'user_grad',
+                text: 'Any tips for negotiating a starting salary as a junior developer?',
+                timestamp: new Date(Date.now() - 180000) // 3 minutes ago
+            }
+        ];
+
+        // Store messages in memory
+        let messages = [...initialMessages];
 
         // DOM Elements
         const chatWindow = document.getElementById('chatWindow');
@@ -358,114 +391,53 @@
         const memberList = document.getElementById('memberList');
         const memberCount = document.getElementById('memberCount');
 
-        // Connect to WebSocket
-        function connect() {
-            const socket = new WebSocket(WS_URL);
+        // Initialize chat room
+        function initChatRoom() {
+            loadMembers();
+            loadMessages();
             
-            socket.onopen = function() {
-                console.log('WebSocket Connected');
-                isConnected = true;
-                loadInitialData();
-            };
-
-            socket.onmessage = function(event) {
-                const message = JSON.parse(event.data);
-                handleIncomingMessage(message);
-            };
-
-            socket.onclose = function() {
-                console.log('WebSocket Disconnected');
-                isConnected = false;
-                setTimeout(connect, 3000); // Reconnect after 3 seconds
-            };
-
-            socket.onerror = function(error) {
-                console.error('WebSocket Error:', error);
-            };
-
-            return socket;
+            // Focus on input
+            messageInput.focus();
         }
 
-        // Load initial data
-        async function loadInitialData() {
-            await Promise.all([
-                fetchMessages(),
-                fetchMembers()
-            ]);
+        // Load members
+        function loadMembers() {
+            memberList.innerHTML = '';
+            memberCount.textContent = onlineMembers.length;
+            
+            onlineMembers.forEach(member => {
+                const li = document.createElement('li');
+                li.className = 'member-item';
+                li.innerHTML = `
+                    <span class="online-indicator"></span>
+                    <span class="member-name">${escapeHtml(member.name)}</span>
+                `;
+                memberList.appendChild(li);
+            });
         }
 
-        // Fetch last 50 messages
-        async function fetchMessages() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/community/messages?limit=50`);
-                const data = await response.json();
-                
-                chatWindow.innerHTML = '';
-                
-                if (data.messages && data.messages.length > 0) {
-                    data.messages.forEach(msg => displayMessage(msg));
-                    scrollToBottom();
-                } else {
-                    chatWindow.innerHTML = '<div class="status-message">No messages yet. Start the conversation!</div>';
-                }
-            } catch (error) {
-                console.error('Error fetching messages:', error);
-                chatWindow.innerHTML = '<div class="status-message">Failed to load messages. Please refresh.</div>';
-            }
-        }
-
-        // Fetch online members
-        async function fetchMembers() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/community/members`);
-                const data = await response.json();
-                
-                memberList.innerHTML = '';
-                memberCount.textContent = data.members.length;
-                
-                if (data.members && data.members.length > 0) {
-                    data.members.forEach(member => {
-                        const li = document.createElement('li');
-                        li.className = 'member-item';
-                        li.innerHTML = `
-                            <span class="online-indicator"></span>
-                            <span class="member-name">${member.username}</span>
-                        `;
-                        memberList.appendChild(li);
-                    });
-                } else {
-                    memberList.innerHTML = '<li class="status-message">No members online</li>';
-                }
-            } catch (error) {
-                console.error('Error fetching members:', error);
-                memberList.innerHTML = '<li class="status-message">Failed to load members</li>';
-            }
+        // Load initial messages
+        function loadMessages() {
+            chatWindow.innerHTML = '';
+            messages.forEach(msg => displayMessage(msg));
+            scrollToBottom();
         }
 
         // Display message in chat window
         function displayMessage(msg) {
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${msg.userId === userId ? 'own' : 'other'}`;
+            const isOwn = msg.userId === currentUser.id;
+            messageDiv.className = `message ${isOwn ? 'own' : 'other'}`;
             
             messageDiv.innerHTML = `
                 <div class="message-header">
-                    <span class="message-author">${msg.author || msg.username}</span>
+                    <span class="message-author">${escapeHtml(msg.author)}</span>
                     <span class="message-time">${formatTime(msg.timestamp)}</span>
                 </div>
-                <div class="message-bubble">${escapeHtml(msg.text || msg.content)}</div>
+                <div class="message-bubble">${escapeHtml(msg.text)}</div>
             `;
             
             chatWindow.appendChild(messageDiv);
-        }
-
-        // Handle incoming WebSocket message
-        function handleIncomingMessage(message) {
-            if (message.type === 'CHAT') {
-                displayMessage(message);
-                scrollToBottom();
-            } else if (message.type === 'MEMBER_JOIN' || message.type === 'MEMBER_LEAVE') {
-                fetchMembers();
-            }
         }
 
         // Send message
@@ -473,58 +445,41 @@
             const text = messageInput.value.trim();
             
             if (!text) return;
-            if (!isConnected) {
-                alert('Not connected to chat. Please wait...');
-                return;
-            }
 
-            const message = {
-                type: 'CHAT',
-                userId: userId,
-                username: username,
+            const newMessage = {
+                id: messages.length + 1,
+                author: currentUser.name,
+                userId: currentUser.id,
                 text: text,
-                timestamp: new Date().toISOString()
+                timestamp: new Date()
             };
 
-            // Send via WebSocket
-            fetch(`${API_BASE_URL}/community/messages`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(message)
-            })
-            .then(response => response.json())
-            .then(() => {
-                messageInput.value = '';
-                messageInput.focus();
-            })
-            .catch(error => {
-                console.error('Error sending message:', error);
-                alert('Failed to send message. Please try again.');
-            });
+            // Add message to array
+            messages.push(newMessage);
+            
+            // Display message
+            displayMessage(newMessage);
+            
+            // Clear input and scroll
+            messageInput.value = '';
+            messageInput.focus();
+            scrollToBottom();
         }
 
         // Handle Enter key press
-        function handleKeyPress(event) {
+        messageInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
-        }
+        });
+
+        // Send button click
+        sendBtn.addEventListener('click', sendMessage);
 
         // Leave chatroom
         function leaveChatroom() {
             if (confirm('Are you sure you want to leave the chat room?')) {
-                fetch(`${API_BASE_URL}/community/leave`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: userId })
-                })
-                .finally(() => {
-                    window.location.href = /*[[@{/community}]]*/ '/community';
-                });
+                window.history.back(); // Goes back to the previous page (community page)
             }
         }
 
@@ -552,28 +507,10 @@
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
-        // Initialize
+        // Initialize on page load
         window.onload = function() {
-            connect();
-            
-            // Refresh members list every 10 seconds
-            setInterval(fetchMembers, 10000);
+            initChatRoom();
         };
-
-        // Cleanup on page unload
-        window.onbeforeunload = function() {
-            if (isConnected) {
-                fetch(`${API_BASE_URL}/community/leave`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: userId }),
-                    keepalive: true
-                });
-            }
-        };
-        /*]]>*/
     </script>
 </body>
 </html>
