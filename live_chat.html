@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Career Community - Live Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e8e6e1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .chat-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatroom-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .leave-btn {
+            padding: 0.6rem 1.5rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .leave-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Main Chat Container */
+        .chat-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            max-width: 1400px;
+            margin: 1rem auto;
+            width: 100%;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            border-bottom: 2px solid #5a6c7d;
+            padding-bottom: 0.5rem;
+        }
+
+        .member-list {
+            list-style: none;
+        }
+
+        .member-item {
+            padding: 0.7rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .member-item:hover {
+            background: #e9ecef;
+        }
+
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+        }
+
+        .member-name {
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Chat Window */
+        .chat-window {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Message Styles */
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 70%;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.own {
+            align-self: flex-end;
+        }
+
+        .message.other {
+            align-self: flex-start;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .message-author {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #5a6c7d;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .message-bubble {
+            padding: 0.8rem 1rem;
+            border-radius: 15px;
+            word-wrap: break-word;
+        }
+
+        .message.own .message-bubble {
+            background: #5a6c7d;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.other .message-bubble {
+            background: #f1f3f5;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+
+        /* Message Input Area */
+        .message-input-area {
+            padding: 1.5rem;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .message-input:focus {
+            border-color: #5a6c7d;
+        }
+
+        .send-btn {
+            padding: 0.8rem 2rem;
+            background: #5a6c7d;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #4a5c6d;
+            transform: translateY(-2px);
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading and Status */
+        .status-message {
+            text-align: center;
+            padding: 1rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .chat-container {
+                padding: 0 0.5rem;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            .chat-header {
+                padding: 1rem;
+            }
+
+            .chatroom-title {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Scrollbar Styling */
+        .chat-window::-webkit-scrollbar,
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-window::-webkit-scrollbar-track,
+        .sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .chat-window::-webkit-scrollbar-thumb,
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #5a6c7d;
+            border-radius: 10px;
+        }
+
+        .chat-window::-webkit-scrollbar-thumb:hover,
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #4a5c6d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="chat-header">
+        <h1 class="chatroom-title">Tech Career Community</h1>
+        <button class="leave-btn" onclick="leaveChatroom()">Leave Room</button>
+    </div>
+
+    <!-- Main Chat Container -->
+    <div class="chat-container">
+        <!-- Sidebar - Members List -->
+        <div class="sidebar">
+            <h3 class="sidebar-title">Online Members (<span id="memberCount">0</span>)</h3>
+            <ul class="member-list" id="memberList">
+                <li class="status-message">Loading members...</li>
+            </ul>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <!-- Chat Window -->
+            <div class="chat-window" id="chatWindow">
+                <div class="status-message">Loading messages...</div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="message-input-area">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    class="message-input" 
+                    placeholder="Type your message..."
+                    maxlength="500"
+                    onkeypress="handleKeyPress(event)"
+                />
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Configuration
+        const API_BASE_URL = /*[[@{/api}]]*/ '/api';
+        const WS_URL = /*[[@{/ws}]]*/ 'ws://localhost:8080/ws';
+        
+        // User info
+        let userId = localStorage.getItem('userId') || 'user_' + Math.random().toString(36).substr(2, 9);
+        let username = localStorage.getItem('username') || 'User_' + userId.substr(-4);
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('username', username);
+
+        // WebSocket connection
+        let stompClient = null;
+        let isConnected = false;
+
+        // DOM Elements
+        const chatWindow = document.getElementById('chatWindow');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const memberList = document.getElementById('memberList');
+        const memberCount = document.getElementById('memberCount');
+
+        // Connect to WebSocket
+        function connect() {
+            const socket = new WebSocket(WS_URL);
+            
+            socket.onopen = function() {
+                console.log('WebSocket Connected');
+                isConnected = true;
+                loadInitialData();
+            };
+
+            socket.onmessage = function(event) {
+                const message = JSON.parse(event.data);
+                handleIncomingMessage(message);
+            };
+
+            socket.onclose = function() {
+                console.log('WebSocket Disconnected');
+                isConnected = false;
+                setTimeout(connect, 3000); // Reconnect after 3 seconds
+            };
+
+            socket.onerror = function(error) {
+                console.error('WebSocket Error:', error);
+            };
+
+            return socket;
+        }
+
+        // Load initial data
+        async function loadInitialData() {
+            await Promise.all([
+                fetchMessages(),
+                fetchMembers()
+            ]);
+        }
+
+        // Fetch last 50 messages
+        async function fetchMessages() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/community/messages?limit=50`);
+                const data = await response.json();
+                
+                chatWindow.innerHTML = '';
+                
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(msg => displayMessage(msg));
+                    scrollToBottom();
+                } else {
+                    chatWindow.innerHTML = '<div class="status-message">No messages yet. Start the conversation!</div>';
+                }
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+                chatWindow.innerHTML = '<div class="status-message">Failed to load messages. Please refresh.</div>';
+            }
+        }
+
+        // Fetch online members
+        async function fetchMembers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/community/members`);
+                const data = await response.json();
+                
+                memberList.innerHTML = '';
+                memberCount.textContent = data.members.length;
+                
+                if (data.members && data.members.length > 0) {
+                    data.members.forEach(member => {
+                        const li = document.createElement('li');
+                        li.className = 'member-item';
+                        li.innerHTML = `
+                            <span class="online-indicator"></span>
+                            <span class="member-name">${member.username}</span>
+                        `;
+                        memberList.appendChild(li);
+                    });
+                } else {
+                    memberList.innerHTML = '<li class="status-message">No members online</li>';
+                }
+            } catch (error) {
+                console.error('Error fetching members:', error);
+                memberList.innerHTML = '<li class="status-message">Failed to load members</li>';
+            }
+        }
+
+        // Display message in chat window
+        function displayMessage(msg) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${msg.userId === userId ? 'own' : 'other'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <span class="message-author">${msg.author || msg.username}</span>
+                    <span class="message-time">${formatTime(msg.timestamp)}</span>
+                </div>
+                <div class="message-bubble">${escapeHtml(msg.text || msg.content)}</div>
+            `;
+            
+            chatWindow.appendChild(messageDiv);
+        }
+
+        // Handle incoming WebSocket message
+        function handleIncomingMessage(message) {
+            if (message.type === 'CHAT') {
+                displayMessage(message);
+                scrollToBottom();
+            } else if (message.type === 'MEMBER_JOIN' || message.type === 'MEMBER_LEAVE') {
+                fetchMembers();
+            }
+        }
+
+        // Send message
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            
+            if (!text) return;
+            if (!isConnected) {
+                alert('Not connected to chat. Please wait...');
+                return;
+            }
+
+            const message = {
+                type: 'CHAT',
+                userId: userId,
+                username: username,
+                text: text,
+                timestamp: new Date().toISOString()
+            };
+
+            // Send via WebSocket
+            fetch(`${API_BASE_URL}/community/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(message)
+            })
+            .then(response => response.json())
+            .then(() => {
+                messageInput.value = '';
+                messageInput.focus();
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                alert('Failed to send message. Please try again.');
+            });
+        }
+
+        // Handle Enter key press
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Leave chatroom
+        function leaveChatroom() {
+            if (confirm('Are you sure you want to leave the chat room?')) {
+                fetch(`${API_BASE_URL}/community/leave`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId: userId })
+                })
+                .finally(() => {
+                    window.location.href = /*[[@{/community}]]*/ '/community';
+                });
+            }
+        }
+
+        // Utility functions
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function scrollToBottom() {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Initialize
+        window.onload = function() {
+            connect();
+            
+            // Refresh members list every 10 seconds
+            setInterval(fetchMembers, 10000);
+        };
+
+        // Cleanup on page unload
+        window.onbeforeunload = function() {
+            if (isConnected) {
+                fetch(`${API_BASE_URL}/community/leave`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId: userId }),
+                    keepalive: true
+                });
+            }
+        };
+        /*]]>*/
+    </script>
+</body>
+</html>
