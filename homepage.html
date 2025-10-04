@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - A.L.I.E.N</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e8e6e1;
+            min-height: 100vh;
+            color: #2c3e50;
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: #e8e6e1;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.1);
+        }
+
+        .hamburger span {
+            width: 30px;
+            height: 3px;
+            background: #2c3e50;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        .embassy-nav-btn {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .embassy-nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        /* Left Sidebar Navigation - 1/4 screen */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -25%;
+            width: 25%;
+            height: 100vh;
+            background: #ffffff;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            background: linear-gradient(135deg, #5a67d8 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            color: #2c3e50;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+            border-left-color: #5a67d8;
+            padding-left: 30px;
+        }
+
+        .menu-item .icon {
+            font-size: 20px;
+            width: 30px;
+        }
+
+        .menu-item .text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 15px 25px;
+        }
+
+        .logout-btn {
+            margin: 20px 25px;
+            padding: 12px 20px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 100%;
+            padding: 0;
+            min-height: calc(100vh - 90px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            padding: 60px 40px 40px;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #5a67d8 0%, #8b5cf6 100%);
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 70px;
+            box-shadow: 0 10px 40px rgba(90, 103, 216, 0.3);
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .hero-tagline {
+            font-size: 18px;
+            color: #5a67d8;
+            font-weight: 600;
+            margin-bottom: 40px;
+        }
+
+        /* Scrollable Cards Section */
+        .cards-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 40px 100px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            font-size: 50px;
+        }
+
+        .card-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .card-description {
+            font-size: 16px;
+            color: #6c757d;
+            line-height: 1.8;
+        }
+
+        /* Visa Small Cards Grid */
+        .visa-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .visa-small-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .visa-small-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .visa-small-card .card-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .visa-small-card h3 {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .visa-small-card p {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        /* Full Screen Modal */
+        .fullscreen-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #e8e6e1;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .fullscreen-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-nav {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            background: #f8f9fa;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #e9ecef;
+            transform: scale(1.05);
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .modal-content-area {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .modal-content-area p {
+            font-size: 16px;
+            color: #34495e;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .modal-content-area h3 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            margin-top: 30px;
+        }
+
+        .requirements-box {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin: 25px 0;
+            border-left: 4px solid #5a67d8;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .requirements-box h4 {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .requirements-box p {
+            margin-bottom: 15px;
+        }
+
+        .application-steps {
+            margin-top: 30px;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateX(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            background: #5a67d8;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .step-text {
+            flex: 1;
+            color: #34495e;
+            padding-top: 5px;
+            font-size: 15px;
+        }
+
+        /* Country Cards in Modal */
+        .country-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .country-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        .country-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .country-flag {
+            font-size: 40px;
+        }
+
+        .country-name {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .country-section {
+            margin-bottom: 20px;
+        }
+
+        .country-section h4 {
+            font-size: 18px;
+            color: #5a67d8;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .country-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .country-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #34495e;
+            font-size: 15px;
+        }
+
+        .country-list li:before {
+            content: "▪";
+            position: absolute;
+            left: 0;
+            color: #5a67d8;
+            font-size: 20px;
+        }
+
+        .why-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #5a67d8;
+        }
+
+        .why-section h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .why-section p {
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        /* Chatbot Button */
+        .chatbot-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5a67d8 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(90, 103, 216, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 900;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(90, 103, 216, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 75%;
+                left: -75%;
+            }
+
+            .top-nav {
+                padding: 15px 20px;
+            }
+
+            .hero-title {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .hero-subtitle {
+                font-size: 12px;
+            }
+
+            .cards-container {
+                padding: 0 20px 80px;
+            }
+
+            .info-card {
+                padding: 30px 25px;
+            }
+
+            .card-title {
+                font-size: 22px;
+            }
+
+            .visa-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-nav {
+                padding: 15px 20px;
+            }
+
+            .modal-title {
+                font-size: 22px;
+            }
+
+            .modal-content-area {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="embassy-nav-btn" onclick="window.location.href='/embassy'" title="Embassy Resources">
+            🏛️
+        </div>
+    </nav>
+
+    <!-- Left Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Navigation</h2>
+            <p>Explore all features</p>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/home" class="menu-item">
+                <span class="icon">🏠</span>
+                <span class="text">Home</span>
+            </a>
+            <a href="/checklist" class="menu-item">
+                <span class="icon">✓</span>
+                <span class="text">Requirements Checklist</span>
+            </a>
+            <a href="/community" class="menu-item">
+                <span class="icon">👥</span>
+                <span class="text">Community Hub</span>
+            </a>
+            <a href="/success-stories" class="menu-item">
+                <span class="icon">⭐</span>
+                <span class="text">Success Stories</span>
+            </a>
+            <a href="/companies" class="menu-item">
+                <span class="icon">🏢</span>
+                <span class="text">Company Spotlight</span>
+            </a>
+            <div class="menu-divider"></div>
+            <a href="/profile" class="menu-item">
+                <span class="icon">👤</span>
+                <span class="text">My Profile</span>
+            </a>
+            <a href="/settings" class="menu-item">
+                <span class="icon">⚙️</span>
+                <span class="text">Settings</span>
+            </a>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+            <span>🚪</span>
+            <span>Logout</span>
+        </button>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="logo-container">
+                <div class="logo">👽</div>
+            </div>
+            <h1 class="hero-title">A.L.I.E.A.N</h1>
+            <p class="hero-subtitle">ASSISTANCE FOR LEARNERS AND IMMIGRANTS WITH EMPLOYMENT AND<br>NATIONAL OPPORTUNITIES</p>
+            <p class="hero-tagline">Skip the H-1B Visa Lottery • Choose Excellence</p>
+        </div>
+
+        <!-- Scrollable Cards -->
+        <div class="cards-container">
+            
+            <!-- Visa Options Grid -->
+            <div class="visa-grid">
+                <div class="visa-small-card" onclick="openFullModal('f1')">
+                    <div class="card-icon">🎓</div>
+                    <h3>F-1 Visa</h3>
+                    <p>Student visa pathway</p>
+                </div>
+
+                <div class="visa-small-card" onclick="openFullModal('o1')">
+                    <div class="card-icon">🌟</div>
+                    <h3>O-1 Visa</h3>
+                    <p>Extraordinary ability</p>
+                </div>
+
+                <div class="visa-small-card" onclick="openFullModal('countries')">
+                    <div class="card-icon">🌍</div>
+                    <h3>Other Countries</h3>
+                    <p>Global opportunities</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Screen Modals -->
+    <!-- Merit Modal -->
+
+
+    <!-- F-1 Modal -->
+    <div class="fullscreen-modal" id="f1Modal">
+        <div class="modal-nav">
+            <button class="back-btn" onclick="closeFullModal('f1')">←</button>
+            <h2 class="modal-title"><span>🎓</span> F-1 Student Visa</h2>
+        </div>
+        <div class="modal-content-area">
+            <p>The F-1 visa is a non-immigrant visa that allows international students to study in the United States at accredited colleges, universities, or other academic institutions. To apply for an F-1 visa, a student must first get admission from a U.S. school and receive an I-20 form, which is required to submit the visa application.</p>
+
+            <div class="requirements-box">
+                <h4>What You Need to Know</h4>
+                <p>Applicants must demonstrate that they have sufficient funds to cover tuition and living expenses, maintain a minimum GPA (usually 2.0 for undergraduates and 3.0 for graduates), and intend to return to their home country after completing their studies.</p>
+                <p>Students may also participate in extracurricular activities, internships, or research projects, which can enhance their profile. After completing their studies, F-1 visa holders may be eligible for Optional Practical Training (OPT), which allows them to work in their field of study in the U.S. for a limited period.</p>
+            </div>
+
+            <div class="application-steps">
+                <h3>How to Apply</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Receive admission from a U.S. school and get the I-20 form.</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Pay the SEVIS fee and complete the DS-160 visa application.</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Schedule and attend the U.S. embassy or consulate interview, providing financial documents and academic records.</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Wait for visa approval and travel to the U.S. to begin studies.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- O-1 Modal -->
+    <div class="fullscreen-modal" id="o1Modal">
+        <div class="modal-nav">
+            <button class="back-btn" onclick="closeFullModal('o1')">←</button>
+            <h2 class="modal-title"><span>🌟</span> O-1 Extraordinary Ability Visa</h2>
+        </div>
+        <div class="modal-content-area">
+            <p>The O-1 visa is a non-immigrant visa for individuals who have demonstrated extraordinary ability in fields such as science, arts, education, business, or athletics. Applicants must provide evidence of their achievements, which can include national or international awards, published research, patents, media coverage, high-level employment, or leadership roles.</p>
+
+            <div class="requirements-box">
+                <h4>What You Need to Know</h4>
+                <p>There is no GPA requirement for O-1 visas, as eligibility is based on accomplishments and recognition in the applicant's field.</p>
+                <p>O-1 visa holders may also submit recommendation letters and proof of their role in judging competitions or contributing to important projects. The visa is usually sponsored by a U.S. employer or agent, who files a petition on behalf of the applicant.</p>
+            </div>
+
+            <div class="application-steps">
+                <h3>How to Apply</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Gather evidence of extraordinary ability in your field.</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Have a U.S. employer or agent file the Form I-129 petition with USCIS.</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Attend a U.S. embassy or consulate interview, if required.</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Upon approval, travel to the U.S. to work in your specialized field.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Countries Modal -->
+    <div class="fullscreen-modal" id="countriesModal">
+        <div class="modal-nav">
+            <button class="back-btn" onclick="closeFullModal('countries')">←</button>
+            <h2 class="modal-title"><span>🌍</span> Other Countries</h2>
+        </div>
+        <div class="modal-content-area">
+            <!-- United Kingdom -->
+            <div class="country-card">
+                <div class="country-header">
+                    <span class="country-flag">UK</span>
+                    <h3 class="country-name">United Kingdom</h3>
+                </div>
+                
+                <div class="country-section">
+                    <h4>🎓 Top Universities for Students (F-1 Equivalent / Student Visa)</h4>
+                    <ul class="country-list">
+                        <li>University of Oxford</li>
+                        <li>University of Cambridge</li>
+                        <li>Imperial College London</li>
+                        <li>London School of Economics (LSE)</li>
+                    </ul>
+                </div>
+
+                <div class="country-section">
+                    <h4>🏢 Top Companies for Professionals (O-1 Equivalent / Skilled Work Visa)</h4>
+                    <ul class="country-list">
+                        <li>Google UK (London & Manchester)</li>
+                        <li>Microsoft UK</li>
+                        <li>HSBC</li>
+                        <li>BP (British Petroleum)</li>
+                        <li>Rolls-Royce</li>
+                        <li>Unilever</li>
+                    </ul>
+                </div>
+
+                <div class="why-section">
+                    <h4>Why UK?</h4>
+                    <p>World-class education and strong multinational companies make the UK ideal for students and professionals. Opportunities exist in finance, tech, engineering, and research sectors.</p>
+                </div>
+            </div>
+
+            <!-- Canada -->
+            <div class="country-card">
+                <div class="country-header">
+                    <span class="country-flag">🇨🇦</span>
+                    <h3 class="country-name">Canada</h3>
+                </div>
+                
+                <div class="country-section">
+                    <h4>🎓 Top Universities for Students</h4>
+                    <ul class="country-list">
+                        <li>University of Toronto</li>
+                        <li>McGill University</li>
+                        <li>University of British Columbia (UBC)</li>
+                        <li>University of Waterloo</li>
+                    </ul>
+                </div>
+
+                <div class="country-section">
+                    <h4>🏢 Top Companies for Professionals</h4>
+                    <ul class="country-list">
+                        <li>Shopify (E-commerce & Tech)</li>
+                        <li>RBC (Royal Bank of Canada)</li>
+                        <li>Deloitte Canada</li>
+                        <li>CGI (IT & Consulting)</li>
+                        <li>Amazon Canada</li>
+                    </ul>
+                </div>
+
+                <div class="why-section">
+                    <h4>Why Canada?</h4>
+                    <p>Affordable, high-quality education and tech/business hubs in Toronto, Vancouver, and Montreal. Skilled professionals benefit from Express Entry & Global Talent Stream pathways.</p>
+                </div>
+            </div>
+
+            <!-- Australia -->
+            <div class="country-card">
+                <div class="country-header">
+                    <span class="country-flag">🇦🇺</span>
+                    <h3 class="country-name">Australia</h3>
+                </div>
+                
+                <div class="country-section">
+                    <h4>🎓 Top Universities for Students</h4>
+                    <ul class="country-list">
+                        <li>University of Melbourne</li>
+                        <li>Australian National University (ANU)</li>
+                        <li>University of Sydney</li>
+                        <li>University of Queensland</li>
+                    </ul>
+                </div>
+
+                <div class="country-section">
+                    <h4>🏢 Top Companies for Professionals</h4>
+                    <ul class="country-list">
+                        <li>Atlassian (Software & IT)</li>
+                        <li>Commonwealth Bank of Australia</li>
+                        <li>CSIRO (Scientific Research)</li>
+                        <li>BHP (Mining & Resources)</li>
+                        <li>Qantas</li>
+                    </ul>
+                </div>
+
+                <div class="why-section">
+                    <h4>Why Australia?</h4>
+                    <p>High-quality education, research-focused programs, and a strong job market for STEM, business, and research professionals. Work visa pathways are available for skilled graduates.</p>
+                </div>
+            </div>
+
+            <!-- Germany -->
+            <div class="country-card">
+                <div class="country-header">
+                    <span class="country-flag">GER</span>
+                    <h3 class="country-name">Germany</h3>
+                </div>
+                
+                <div class="country-section">
+                    <h4>🎓 Top Universities for Students</h4>
+                    <ul class="country-list">
+                        <li>Technical University of Munich (TUM)</li>
+                        <li>Heidelberg University</li>
+                        <li>Humboldt University of Berlin</li>
+                        <li>RWTH Aachen University</li>
+                    </ul>
+                </div>
+
+                <div class="country-section">
+                    <h4>🏢 Top Companies for Professionals</h4>
+                    <ul class="country-list">
+                        <li>Siemens</li>
+                        <li>BMW</li>
+                        <li>Bosch</li>
+                        <li>SAP</li>
+                        <li>Allianz</li>
+                    </ul>
+                </div>
+
+                <div class="why-section">
+                    <h4>Why Germany?</h4>
+                    <p>Tuition-free or low-cost education, strong engineering/tech programs, and high demand for skilled professionals. EU Blue Card allows work across Europe.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-button" title="Chat with us">
+        💬
+    </button>
+
+    <script>
+        // Hamburger and Sidebar Toggle
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking overlay
+        overlay.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Full Screen Modal Functions
+        function openFullModal(type) {
+            const modal = document.getElementById(type + 'Modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFullModal(type) {
+            const modal = document.getElementById(type + 'Modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Logout Function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/welcome';
+            }
+        }
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.fullscreen-modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
