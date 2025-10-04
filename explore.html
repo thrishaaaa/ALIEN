@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore - A.L.I.E.A.N</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8e5f0 0%, #f5f3f8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #7c6fd6 0%, #9b8ee6 100%);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            letter-spacing: 0.3em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7c6fd6;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #7c6fd6;
+        }
+
+        .scroll-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding: 10px 0;
+            scroll-behavior: smooth;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #7c6fd6;
+            border-radius: 10px;
+        }
+
+        .card {
+            min-width: 320px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(124, 111, 214, 0.2);
+            border-color: #7c6fd6;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #7c6fd6 0%, #9b8ee6 100%);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+        }
+
+        .card-title {
+            color: #2c3e50;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .card-badge {
+            background: #7c6fd6;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .card-duration {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .job-card {
+            min-width: 320px;
+            background: linear-gradient(135deg, #fff9f0 0%, #ffffff 100%);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 159, 64, 0.2);
+            border-color: #ff9f40;
+        }
+
+        .job-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .company-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff9f40 0%, #ffb366 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .job-info {
+            flex: 1;
+        }
+
+        .company-name {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .job-title {
+            color: #2c3e50;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .job-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .detail-tag {
+            background: #f0f0f0;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .extracurricular-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+
+        .activity-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .activity-title {
+            color: #2c3e50;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .activity-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .register-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .register-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-header {
+            margin-bottom: 30px;
+        }
+
+        .modal-title {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .modal-subtitle {
+            color: #7c6fd6;
+            font-size: 1.1em;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h3 {
+            color: #2c3e50;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .modal-section p, .modal-section ul {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .modal-section ul {
+            padding-left: 20px;
+        }
+
+        .modal-section li {
+            margin-bottom: 8px;
+        }
+
+        .enroll-btn {
+            background: linear-gradient(135deg, #7c6fd6 0%, #9b8ee6 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .enroll-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(124, 111, 214, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .section-title {
+                font-size: 1.4em;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">👽</div>
+        <h1>A.L.I.E.N</h1>
+        <p class="subtitle">Explore Your Path to Excellence</p>
+    </div>
+
+    <!-- Technical Courses Section -->
+    <div class="section">
+        <h2 class="section-title">📚 Technical Courses</h2>
+        <div class="scroll-container">
+            <div class="card" onclick="openModal('course1')">
+                <div class="card-image">💻</div>
+                <h3 class="card-title">Advanced Data Structures & Algorithms</h3>
+                <p class="card-description">Master complex algorithms and data structures to excel in technical interviews and boost your GPA.</p>
+                <div class="card-meta">
+                    <span class="card-badge">Beginner-Advanced</span>
+                    <span class="card-duration">12 weeks</span>
+                </div>
+            </div>
+
+            <div class="card" onclick="openModal('course2')">
+                <div class="card-image">🤖</div>
+                <h3 class="card-title">Machine Learning & AI Fundamentals</h3>
+                <p class="card-description">Learn ML algorithms, neural networks, and AI applications with hands-on projects.</p>
+                <div class="card-meta">
+                    <span class="card-badge">Intermediate</span>
+                    <span class="card-duration">10 weeks</span>
+                </div>
+            </div>
+
+            <div class="card" onclick="openModal('course3')">
+                <div class="card-image">☁️</div>
+                <h3 class="card-title">Cloud Computing with AWS & Azure</h3>
+                <p class="card-description">Build scalable cloud applications and earn industry-recognized certifications.</p>
+                <div class="card-meta">
+                    <span class="card-badge">All Levels</span>
+                    <span class="card-duration">8 weeks</span>
+                </div>
+            </div>
+
+            <div class="card" onclick="openModal('course4')">
+                <div class="card-image">📱</div>
+                <h3 class="card-title">Full-Stack Web Development</h3>
+                <p class="card-description">Create modern web applications using React, Node.js, and MongoDB.</p>
+                <div class="card-meta">
+                    <span class="card-badge">Beginner</span>
+                    <span class="card-duration">14 weeks</span>
+                </div>
+            </div>
+
+            <div class="card" onclick="openModal('course5')">
+                <div class="card-image">🔒</div>
+                <h3 class="card-title">Cybersecurity & Ethical Hacking</h3>
+                <p class="card-description">Learn security fundamentals, penetration testing, and network defense strategies.</p>
+                <div class="card-meta">
+                    <span class="card-badge">Advanced</span>
+                    <span class="card-duration">10 weeks</span>
+                </div>
+            </div>
+
+            <div class="card" onclick="openModal('course6')">
+                <div class="card-image">📊</div>
+                <h3 class="card-title">Data Science with Python</h3>
+                <p class="card-description">Analyze data, build models, and create visualizations using Python libraries.</p>
+                <div class="card-meta">
+                    <span class="card-badge">Intermediate</span>
+                    <span class="card-duration">12 weeks</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Internships Section -->
+    <div class="section">
+        <h2 class="section-title">💼 Internship Opportunities</h2>
+        <div class="scroll-container">
+            <div class="job-card" onclick="openModal('intern1')">
+                <div class="job-header">
+                    <div class="company-logo">🚀</div>
+                    <div class="job-info">
+                        <div class="company-name">Tech Innovations Inc.</div>
+                        <div class="job-title">Software Engineering Intern</div>
+                    </div>
+                </div>
+                <p class="card-description">Work on cutting-edge projects with experienced mentors. Perfect for building your O-1 visa profile.</p>
+                <div class="job-details">
+                    <span class="detail-tag">📍 Remote</span>
+                    <span class="detail-tag">⏰ 3-6 months</span>
+                    <span class="detail-tag">💰 Paid</span>
+                </div>
+            </div>
+
+            <div class="job-card" onclick="openModal('intern2')">
+                <div class="job-header">
+                    <div class="company-logo">🎨</div>
+                    <div class="job-info">
+                        <div class="company-name">Creative Labs</div>
+                        <div class="job-title">UX/UI Design Intern</div>
+                    </div>
+                </div>
+                <p class="card-description">Design user experiences for award-winning products and build your portfolio.</p>
+                <div class="job-details">
+                    <span class="detail-tag">📍 Hybrid</span>
+                    <span class="detail-tag">⏰ 4 months</span>
+                    <span class="detail-tag">💰 Stipend</span>
+                </div>
+            </div>
+
+            <div class="job-card" onclick="openModal('intern3')">
+                <div class="job-header">
+                    <div class="company-logo">📈</div>
+                    <div class="job-info">
+                        <div class="company-name">Data Dynamics</div>
+                        <div class="job-title">Data Analytics Intern</div>
+                    </div>
+                </div>
+                <p class="card-description">Analyze business data and create insights for Fortune 500 clients.</p>
+                <div class="job-details">
+                    <span class="detail-tag">📍 On-site</span>
+                    <span class="detail-tag">⏰ 6 months</span>
+                    <span class="detail-tag">💰 Paid</span>
+                </div>
+            </div>
+
+            <div class="job-card" onclick="openModal('intern4')">
+                <div class="job-header">
+                    <div class="company-logo">🔬</div>
+                    <div class="job-info">
+                        <div class="company-name">AI Research Lab</div>
+                        <div class="job-title">Machine Learning Research Intern</div>
+                    </div>
+                </div>
+                <p class="card-description">Contribute to groundbreaking AI research with publication opportunities.</p>
+                <div class="job-details">
+                    <span class="detail-tag">📍 Remote</span>
+                    <span class="detail-tag">⏰ 5 months</span>
+                    <span class="detail-tag">💰 Scholarship</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jobs Section -->
+    <div class="section">
+        <h2 class="section-title">🎯 Job Openings</h2>
+        <div class="scroll-container">
+            <div class="job-card" onclick="openModal('job1')">
+                <div class="job-header">
+                    <div class="company-logo" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">🌐</div>
+                    <div class="job-info">
+                        <div class="company-name">Global Tech Solutions</div>
+                        <div class="job-title">Full Stack Developer</div>
+                    </div>
+                </div>
+                <p class="card-description">Build scalable applications for international clients. O-1 visa sponsorship available.</p>
+                <div class="job-details">
+                    <span class="detail-tag">📍 San Francisco, CA</span>
+                    <span class="detail-tag">💼 Full-time</span>
+                    <span class="detail-tag">💰 $120K-$150K</span>
+                </div>
+            </div>
+
+            <div class="job-card" onclick="openModal('job2')">
+                <div class="job-header">
+                    <div class="company-logo" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🎯</div>
+                    <div class="job-info">
+                        <div class="company-name">Digital Marketing Pro</div>
+                        <div class="job-title">Product Manager</div>
+                    </div>
+                </div>
+                <p class="card-description">Lead product strategy for innovative SaaS platforms serving millions of users.</p>
+                <div class="job-details">
+                    <span class="detail-tag">📍 New York, NY</span>
+                    <span class="detail-tag">💼 Full-time</span>
+                    <span class="detail-tag">💰 $130K-$160K</span>
+                </div>
+            </div>
+
+            <div class="job-card" onclick="openModal('job3')">
+                <div class="job-header">
+                    <div class="company-logo" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">⚡</div>
+                    <div class="job-info">
+                        <div class="company-name">Cloud Systems Inc.</div>
+                        <div class="job-title">DevOps Engineer</div>
+                    </div>
+                </div>
+                <p class="card-description">Optimize infrastructure and deployment pipelines for high-traffic applications.</p>
+                <div class="job-details">
+                    <span class="detail-tag">📍 Seattle, WA</span>
+                    <span class="detail-tag">💼 Full-time</span>
+                    <span class="detail-tag">💰 $125K-$155K</span>
+                </div>
+            </div>
+
+            <div class="job-card" onclick="openModal('job4')">
+                <div class="job-header">
+                    <div class="company-logo" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🧠</div>
+                    <div class="job-info">
+                        <div class="company-name">AI Ventures</div>
+                        <div class="job-title">AI/ML Engineer</div>
+                    </div>
+                </div>
+                <p class="card-description">Develop cutting-edge AI solutions with a team of world-class researchers.</p>
+                <div class="job-details">
+                    <span class="detail-tag">📍 Boston, MA</span>
+                    <span class="detail-tag">💼 Full-time</span>
+                    <span class="detail-tag">💰 $140K-$180K</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extracurricular Activities Section -->
+    <div class="section">
+        <h2 class="section-title">🌟 Extracurricular Activities</h2>
+        <div class="extracurricular-grid">
+            <div class="activity-card">
+                <div class="activity-icon">🏆</div>
+                <h3 class="activity-title">Coding Competitions</h3>
+                <p class="activity-description">Participate in hackathons and coding challenges to showcase your skills and win prizes.</p>
+                <button class="register-btn" onclick="registerActivity('competition')">Register Now</button>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-icon">🎤</div>
+                <h3 class="activity-title">Tech Talks & Workshops</h3>
+                <p class="activity-description">Attend expert sessions and workshops to learn industry best practices and network.</p>
+                <button class="register-btn" onclick="registerActivity('workshop')">Register Now</button>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-icon">👥</div>
+                <h3 class="activity-title">Mentorship Program</h3>
+                <p class="activity-description">Connect with industry professionals who can guide your O-1 visa journey.</p>
+                <button class="register-btn" onclick="registerActivity('mentorship')">Register Now</button>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-icon">📝</div>
+                <h3 class="activity-title">Research Publications</h3>
+                <p class="activity-description">Collaborate on research projects and publish papers to strengthen your profile.</p>
+                <button class="register-btn" onclick="registerActivity('research')">Register Now</button>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-icon">🌍</div>
+                <h3 class="activity-title">Open Source Contribution</h3>
+                <p class="activity-description">Contribute to impactful open-source projects and build your portfolio.</p>
+                <button class="register-btn" onclick="registerActivity('opensource')">Register Now</button>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-icon">🎓</div>
+                <h3 class="activity-title">Community Leadership</h3>
+                <p class="activity-description">Lead student organizations and community initiatives to demonstrate leadership.</p>
+                <button class="register-btn" onclick="registerActivity('leadership')">Register Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const modalData = {
+            course1: {
+                title: 'Advanced Data Structures & Algorithms',
+                subtitle: 'Master the fundamentals of computer science',
+                sections: [
+                    {
+                        heading: 'Course Overview',
+                        content: 'This comprehensive course covers advanced data structures and algorithms essential for technical interviews and academic excellence. Perfect for students preparing for O-1 visa applications who need to demonstrate exceptional technical abilities.'
+                    },
+                    {
+                        heading: 'What You\'ll Learn',
+                        list: [
+                            'Advanced trees, graphs, and complex data structures',
+                            'Dynamic programming and greedy algorithms',
+                            'System design fundamentals',
+                            'Time and space complexity analysis',
+                            'Interview preparation strategies'
+                        ]
+                    },
+                    {
+                        heading: 'Prerequisites',
+                        content: 'Basic programming knowledge in any language. Familiarity with fundamental data structures is helpful but not required.'
+                    },
+                    {
+                        heading: 'Certificate',
+                        content: 'Receive a certificate of completion that can be used to strengthen your O-1 visa application portfolio.'
+                    }
+                ]
+            },
+            course2: {
+                title: 'Machine Learning & AI Fundamentals',
+                subtitle: 'Build intelligent systems from scratch',
+                sections: [
+                    {
+                        heading: 'Course Overview',
+                        content: 'Dive deep into machine learning algorithms, neural networks, and AI applications. This course provides hands-on experience with real-world projects that demonstrate extraordinary ability in a specialized field.'
+                    },
+                    {
+                        heading: 'What You\'ll Learn',
+                        list: [
+                            'Supervised and unsupervised learning algorithms',
+                            'Neural networks and deep learning',
+                            'Natural language processing basics',
+                            'Computer vision fundamentals',
+                            'Model deployment and optimization'
+                        ]
+                    },
+                    {
+                        heading: 'Projects',
+                        content: 'Build 5+ portfolio projects including image classification, sentiment analysis, and predictive modeling applications.'
+                    }
+                ]
+            },
+            course3: {
+                title: 'Cloud Computing with AWS & Azure',
+                subtitle: 'Build and deploy scalable cloud solutions',
+                sections: [
+                    {
+                        heading: 'Course Overview',
+                        content: 'Learn to architect, build, and deploy applications on major cloud platforms. Gain industry-recognized certifications that demonstrate your expertise.'
+                    },
+                    {
+                        heading: 'What You\'ll Learn',
+                        list: [
+                            'AWS and Azure core services',
+                            'Cloud architecture patterns',
+                            'Container orchestration with Kubernetes',
+                            'CI/CD pipeline implementation',
+                            'Cloud security best practices'
+                        ]
+                    }
+                ]
+            },
+            course4: {
+                title: 'Full-Stack Web Development',
+                subtitle: 'Create modern, responsive web applications',
+                sections: [
+                    {
+                        heading: 'Course Overview',
+                        content: 'Master both frontend and backend development to build complete web applications from scratch.'
+                    },
+                    {
+                        heading: 'What You\'ll Learn',
+                        list: [
+                            'React.js for dynamic UIs',
+                            'Node.js and Express backend',
+                            'MongoDB database design',
+                            'RESTful API development',
+                            'Authentication and security'
+                        ]
+                    }
+                ]
+            },
+            course5: {
+                title: 'Cybersecurity & Ethical Hacking',
+                subtitle: 'Protect systems and networks from threats',
+                sections: [
+                    {
+                        heading: 'Course Overview',
+                        content: 'Learn offensive and defensive security techniques used by industry professionals.'
+                    },
+                    {
+                        heading: 'What You\'ll Learn',
+                        list: [
+                            'Network security fundamentals',
+                            'Penetration testing techniques',
+                            'Web application security',
+                            'Cryptography and encryption',
+                            'Incident response procedures'
+                        ]
+                    }
+                ]
+            },
+            course6: {
+                title: 'Data Science with Python',
+                subtitle: 'Transform data into actionable insights',
+                sections: [
+                    {
+                        heading: 'Course Overview',
+                        content: 'Master data analysis, visualization, and machine learning with Python\'s powerful libraries.'
+                    },
+                    {
+                        heading: 'What You\'ll Learn',
+                        list: [
+                            'Pandas for data manipulation',
+                            'NumPy for numerical computing',
+                            'Matplotlib and Seaborn for visualization',
+                            'Statistical analysis and hypothesis testing',
+                            'Machine learning with scikit-learn'
+                        ]
+                    }
+                ]
+            },
+            intern1: {
+                title: 'Software Engineering Intern',
+                subtitle: 'Tech Innovations Inc.',
+                sections: [
+                    {
+                        heading: 'About the Role',
+                        content: 'Join our engineering team to work on innovative projects that impact millions of users. This internship provides excellent documentation for O-1 visa applications, including recommendation letters and project portfolios.'
+                    },
+                    {
+                        heading: 'Responsibilities',
+                        list: [
+                            'Develop new features for our flagship product',
+                            'Collaborate with senior engineers on complex problems',
+                            'Participate in code reviews and team meetings',
+                            'Write technical documentation',
+                            'Present your work at company showcases'
+                        ]
+                    },
+                    {
+                        heading: 'Requirements',
+                        list: [
+                            'Strong programming skills in Java, Python, or JavaScript',
+                            'Understanding of software development principles',
+                            'Excellent problem-solving abilities',
+                            'Good communication skills'
+                        ]
+                    },
+                    {
+                        heading: 'Benefits',
+                        content: 'Competitive stipend, mentorship from industry leaders, letter of recommendation, and potential for full-time conversion.'
+                    }
+                ]
+            },
+            intern2: {
+                title: 'UX/UI Design Intern',
+                subtitle: 'Creative Labs',
+                sections: [
+                    {
+                        heading: 'About the Role',
+                        content: 'Design exceptional user experiences for award-winning products. Build a portfolio that demonstrates your extraordinary ability in design.'
+                    },
+                    {
+                        heading: 'Responsibilities',
+                        list: [
+                            'Create wireframes and prototypes',
+                            'Conduct user research and testing',
+                            'Design responsive interfaces',
+                            'Collaborate with developers and product managers',
+                            'Present designs to stakeholders'
+                        ]
+                    },
+                    {
+                        heading: 'Requirements',
+                        list: [
+                            'Proficiency in Figma or Adobe XD',
+                            'Strong portfolio of design work',
+                            'Understanding of design principles',
+                            'Creative problem-solving skills'
+                        ]
+                    }
+                ]
+            },
+            intern3: {
+                title: 'Data Analytics Intern',
+                subtitle: 'Data Dynamics',
+                sections: [
+                    {
+                        heading: 'About the Role',
+                        content: 'Analyze complex datasets and provide actionable insights for Fortune 500 clients. Perfect for building evidence of impact in your field.'
+                    },
+                    {
+                        heading: 'Responsibilities',
+                        list: [
+                            'Analyze business data using SQL and Python',
+                            'Create dashboards and visualizations',
+                            'Present findings to clients',
+                            'Develop predictive models',
+                            'Document analysis methodologies'
+                        ]
+                    }
+                ]
+            },
+            intern4: {
+                title: 'Machine Learning Research Intern',
+                subtitle: 'AI Research Lab',
+                sections: [
+                    {
+                        heading: 'About the Role',
+                        content: 'Contribute to cutting-edge AI research with publication opportunities. Ideal for demonstrating scholarly achievements for O-1 visa applications.'
+                    },
+                    {
+                        heading: 'Responsibilities',
+                        list: [
+                            'Conduct literature reviews',
+                            'Implement and test ML algorithms',
+                            'Write research papers',
+                            'Present at lab meetings',
+                            'Collaborate on grant proposals'
+                        ]
+                    }
+                ]
+            },
+            job1: {
+                title: 'Full Stack Developer',
+                subtitle: 'Global Tech Solutions',
+                sections: [
+                    {
+                        heading: 'About the Role',
+                        content: 'Build scalable web applications for international clients. O-1 visa sponsorship available for exceptional candidates.'
+                    },
+                    {
+                        heading: 'Responsibilities',
+                        list: [
+                            'Design and implement full-stack solutions',
+                            'Write clean, maintainable code',
+                            'Collaborate with cross-functional teams',
+                            'Optimize application performance',
+                            'Mentor junior developers'
+                        ]
+                    },
+                    {
+                        heading: 'Requirements',
+                        list: [
+                            '3+ years of full-stack development experience',
+                            'Expertise in React, Node.js, and databases',
+                            'Strong problem-solving skills',
+                            'Experience with cloud platforms',
+                            'Excellent communication abilities'
+                        ]
+                    },
+                    {
+                        heading: 'Benefits',
+                        content: 'Competitive salary ($120K-$150K), health insurance, 401(k) matching, unlimited PTO, and O-1 visa sponsorship for qualified candidates.'
+                    }
+                ]
+            },
+            job2: {
+                title: 'Product Manager',
+                subtitle: 'Digital Marketing Pro',
+                sections: [
+                    {
+                        heading: 'About the Role',
+                        content: 'Lead product strategy for innovative SaaS platforms serving millions of users worldwide.'
+                    },
+                    {
+                        heading: 'Responsibilities',
+                        list: [
+                            'Define product roadmap and strategy',
+                            'Conduct market research and analysis',
+                            'Collaborate with engineering and design teams',
+                            'Gather and prioritize product requirements',
+                            'Measure product success metrics'
+                        ]
+                    }
+                ]
+            },
+            job3: {
+                title: 'DevOps Engineer',
+                subtitle: 'Cloud Systems Inc.',
+                sections: [
+                    {
+                        heading: 'About the Role',
+                        content: 'Optimize infrastructure and deployment pipelines for high-traffic applications serving millions of users.'
+                    },
+                    {
+                        heading: 'Responsibilities',
+                        list: [
+                            'Manage cloud infrastructure (AWS/Azure)',
+                            'Implement CI/CD pipelines',
+                            'Monitor system performance and reliability',
+                            'Automate deployment processes',
+                            'Ensure security best practices'
+                        ]
+                    }
+                ]
+            },
+            job4: {
+                title: 'AI/ML Engineer',
+                subtitle: 'AI Ventures',
+                sections: [
+                    {
+                        heading: 'About the Role',
+                        content: 'Develop cutting-edge AI solutions with a team of world-class researchers and engineers.'
+                    },
+                    {
+                        heading: 'Responsibilities',
+                        list: [
+                            'Design and implement ML models',
+                            'Optimize model performance',
+                            'Deploy models to production',
+                            'Conduct research on new algorithms',
+                            'Collaborate on research publications'
+                        ]
+                    }
+                ]
+            }
+        };
+
+        function openModal(id) {
+            const modal = document.getElementById('modal');
+            const modalBody = document.getElementById('modalBody');
+            const data = modalData[id];
+
+            if (!data) return;
+
+            let content = `
+                <div class="modal-header">
+                    <h2 class="modal-title">${data.title}</h2>
+                    <p class="modal-subtitle">${data.subtitle}</p>
+                </div>
+            `;
+
+            data.sections.forEach(section => {
+                content += `<div class="modal-section">`;
+                content += `<h3>${section.heading}</h3>`;
+                
+                if (section.content) {
+                    content += `<p>${section.content}</p>`;
+                }
+                
+                if (section.list) {
+                    content += `<ul>`;
+                    section.list.forEach(item => {
+                        content += `<li>${item}</li>`;
+                    });
+                    content += `</ul>`;
+                }
+                
+                content += `</div>`;
+            });
+
+            content += `<button class="enroll-btn" onclick="enrollNow('${id}')">Enroll Now</button>`;
+
+            modalBody.innerHTML = content;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('active');
+        }
+
+        function enrollNow(id) {
+            alert('Enrollment form will be displayed here. This would connect to your backend to process the enrollment.');
+            closeModal();
+        }
+
+        function registerActivity(type) {
+            alert(`Registration for ${type} will be processed. This would connect to your backend system.`);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
