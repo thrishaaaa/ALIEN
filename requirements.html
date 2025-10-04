@@ -836,7 +836,7 @@
             <p>Explore all features</p>
         </div>
         <div class="sidebar-menu">
-            <a href="/home" class="menu-item">
+            <a href="/homepage" class="menu-item">
                 <span class="icon">🏠</span>
                 <span class="text">Home</span>
             </a>
@@ -1328,18 +1328,7 @@
                         <button class="btn btn-secondary" onclick="resetVisaSelection()">Go Back</button>
                         <button class="btn btn-primary" onclick="window.location.href='/home'">Return to Home</button>
                     </div>
-                </div>="low-gpa-page">
-                    <div class="alert-box">
-                        <h3>⚠️ GPA Below Threshold</h3>
-                        <p id="lowGpaMessage"></p>
-                        <p style="margin-top: 20px;">We will redirect you to our improvement resources page.</p>
-                    </div>
-                    <div class="btn-container">
-                        <button class="btn btn-secondary" onclick="resetVisaSelection()">Go Back</button>
-                        <button class="btn btn-primary" onclick="window.location.href='/home'">Return to Home</button>
-                    </div>
                 </div>
-
                 <!-- O-1 Questions -->
                 <div id="o1Questions" class="questions-section">
                     <h3 style="margin-bottom: 25px; color: #2c3e50; text-align: center;">O-1 Visa Assessment Questions</h3>
@@ -1898,6 +1887,7 @@
         }
 
         // Check GPA
+        // Check GPA
         function checkGPA() {
             const gpa = parseFloat(document.getElementById('gpaInput').value);
             
@@ -1911,14 +1901,21 @@
 
             if (gpa >= threshold) {
                 document.getElementById('gpaSection').classList.remove('active');
+                document.getElementById('lowGpaPage').classList.remove('active');
+                
                 if (selectedVisaType === 'O1') {
                     document.getElementById('o1Questions').classList.add('active');
+                    document.getElementById('f1Questions').classList.remove('active');
                 } else if (selectedVisaType === 'F1') {
                     document.getElementById('f1Questions').classList.add('active');
+                    document.getElementById('o1Questions').classList.remove('active');
                 }
+                document.getElementById('step2Buttons').style.display = 'flex';
                 document.getElementById('continueBtn2').disabled = false;
             } else {
                 document.getElementById('gpaSection').classList.remove('active');
+                document.getElementById('o1Questions').classList.remove('active');
+                document.getElementById('f1Questions').classList.remove('active');
                 document.getElementById('lowGpaPage').classList.add('active');
                 document.getElementById('step2Buttons').style.display = 'none';
                 
