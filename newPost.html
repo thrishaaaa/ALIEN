@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A.L.I.E.N - Create Post</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e8e6e1;
+            min-height: 100vh;
+            color: #2c3e50;
+            padding: 20px;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: #e8e6e1;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.1);
+        }
+
+        .hamburger span {
+            width: 30px;
+            height: 3px;
+            background: #2c3e50;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        .embassy-nav-btn {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .embassy-nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        /* Left Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -25%;
+            width: 25%;
+            height: 100vh;
+            background: #ffffff;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            background: linear-gradient(135deg, #5a67d8 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            color: #2c3e50;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+            border-left-color: #5a67d8;
+            padding-left: 30px;
+        }
+
+        .menu-item .icon {
+            font-size: 20px;
+            width: 30px;
+        }
+
+        .menu-item .text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 15px 25px;
+        }
+
+        .logout-btn {
+            margin: 20px 25px;
+            padding: 12px 20px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Chatbot Button */
+        .chatbot-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 900;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding-top: 100px;
+            padding-bottom: 40px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #5a67d8;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            gap: 12px;
+            color: #4c59c4;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .card h1 {
+            color: #2c3e50;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .card .subtitle {
+            color: #6c757d;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #5a67d8;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .char-count {
+            text-align: right;
+            color: #6c757d;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #5a67d8 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(90, 103, 216, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 75%;
+                left: -75%;
+            }
+
+            .container {
+                padding-top: 90px;
+            }
+
+            .card {
+                padding: 25px;
+            }
+
+            .card h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="embassy-nav-btn" onclick="window.location.href='/embassy'" title="Embassy Resources">
+            🏛️
+        </div>
+    </nav>
+
+    <!-- Left Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Navigation</h2>
+            <p>Explore all features</p>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/homepage" class="menu-item">
+                <span class="icon">🏠</span>
+                <span class="text">Home</span>
+            </a>
+            <a href="/assessment" class="menu-item">
+                <span class="icon">📋</span>
+                <span class="text">Visa Assessment</span>
+            </a>
+            <a href="/checklist" class="menu-item">
+                <span class="icon">✓</span>
+                <span class="text">Requirements Checklist</span>
+            </a>
+            <a href="/community" class="menu-item">
+                <span class="icon">👥</span>
+                <span class="text">Community Hub</span>
+            </a>
+            <a href="/success-stories" class="menu-item">
+                <span class="icon">⭐</span>
+                <span class="text">Success Stories</span>
+            </a>
+            <a href="/companies" class="menu-item">
+                <span class="icon">🏢</span>
+                <span class="text">Company Spotlight</span>
+            </a>
+            <div class="menu-divider"></div>
+            <a href="/profile" class="menu-item">
+                <span class="icon">👤</span>
+                <span class="text">My Profile</span>
+            </a>
+            <a href="/settings" class="menu-item">
+                <span class="icon">⚙️</span>
+                <span class="text">Settings</span>
+            </a>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+            <span>🚪</span>
+            <span>Logout</span>
+        </button>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-button" title="Chat with us">
+        💬
+    </button>
+
+    <!-- Main Container -->
+    <div class="container">
+        <a href="/pages/posts.html" class="back-btn">
+            ← Back to Community
+        </a>
+
+        <div class="card">
+            <h1>Share Your Success</h1>
+            <p class="subtitle">Inspire others with your journey</p>
+
+            <div class="success-message" id="successMessage">
+                Post created successfully! Redirecting...
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                Something went wrong. Please try again.
+            </div>
+
+            <form id="createPostForm">
+                <div class="form-group">
+                    <label for="username">Your Name</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Enter your name"
+                        required
+                        maxlength="50"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Your Success Story</label>
+                    <textarea 
+                        id="description" 
+                        name="description" 
+                        placeholder="Share your visa success story, tips, or experience..."
+                        required
+                        maxlength="1000"
+                    ></textarea>
+                    <div class="char-count">
+                        <span id="charCount">0</span> / 1000 characters
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Share Your Story
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Hamburger and Sidebar Toggle
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Logout Function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/pages/welcome';
+            }
+        }
+
+        // Character Counter
+        const descriptionField = document.getElementById('description');
+        const charCount = document.getElementById('charCount');
+
+        descriptionField.addEventListener('input', () => {
+            const count = descriptionField.value.length;
+            charCount.textContent = count;
+            
+            if (count > 950) {
+                charCount.style.color = '#e74c3c';
+            } else {
+                charCount.style.color = '#6c757d';
+            }
+        });
+
+        // Form Submission
+        const form = document.getElementById('createPostForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Get form data
+            const username = document.getElementById('username').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            // Validate
+            if (!username || !description) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Posting...';
+
+            try {
+                // Send to backend
+                const response = await fetch('/api/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        description: description,
+                        createdAt: new Date().toISOString()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create post');
+                }
+
+                // Show success message
+                showSuccess();
+                
+                // Reset form
+                form.reset();
+                charCount.textContent = '0';
+
+                // Redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/community';
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error creating post:', error);
+                showError('Failed to create post. Please try again.');
+                
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Share Your Story';
+            }
+        });
+
+        function showSuccess() {
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

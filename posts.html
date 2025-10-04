@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A.L.I.E.N - Community Posts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e8e6e1;
+            min-height: 100vh;
+            color: #2c3e50;
+            padding: 20px;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: #e8e6e1;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.1);
+        }
+
+        .hamburger span {
+            width: 30px;
+            height: 3px;
+            background: #2c3e50;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(8px, -8px);
+        }
+
+        .embassy-nav-btn {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .embassy-nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        /* Left Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -25%;
+            width: 25%;
+            height: 100vh;
+            background: #ffffff;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            background: linear-gradient(135deg, #5a67d8 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            color: #2c3e50;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+            border-left-color: #5a67d8;
+            padding-left: 30px;
+        }
+
+        .menu-item .icon {
+            font-size: 20px;
+            width: 30px;
+        }
+
+        .menu-item .text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 15px 25px;
+        }
+
+        .logout-btn {
+            margin: 20px 25px;
+            padding: 12px 20px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Create Post Button */
+        .create-post-btn {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #5a67d8 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(90, 103, 216, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 900;
+        }
+
+        .create-post-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 30px rgba(90, 103, 216, 0.4);
+        }
+
+        /* Chatbot Button */
+        .chatbot-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 900;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 100px;
+            padding-bottom: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            color: #2c3e50;
+            letter-spacing: 6px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        /* Posts Feed */
+        .posts-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0,0,0,0.12);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .author-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #5a67d8 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .author-info h3 {
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .post-time {
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        .post-content {
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .post-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .like-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 15px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .like-btn:hover {
+            background: #f8f9fa;
+            color: #5a67d8;
+        }
+
+        .like-btn.liked {
+            color: #e74c3c;
+        }
+
+        .like-icon {
+            font-size: 20px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .empty-state h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            font-size: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 75%;
+                left: -75%;
+            }
+
+            .container {
+                padding-top: 90px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+                letter-spacing: 4px;
+            }
+
+            .post-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="embassy-nav-btn" onclick="window.location.href='/embassy'" title="Embassy Resources">
+            🏛️
+        </div>
+    </nav>
+
+    <!-- Left Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Navigation</h2>
+            <p>Explore all features</p>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/pages/homepage.html" class="menu-item">
+                <span class="icon">🏠</span>
+                <span class="text">Home</span>
+            </a>
+            <a href="/pages/requirements.html" class="menu-item">
+                <span class="icon">📋</span>
+                <span class="text">Visa Assessment</span>
+            </a>
+            <a href="/checklist" class="menu-item">
+                <span class="icon">✓</span>
+                <span class="text">Requirements Checklist</span>
+            </a>
+            <a href="/community" class="menu-item">
+                <span class="icon">👥</span>
+                <span class="text">Community Hub</span>
+            </a>
+            <a href="/pages/posts.html" class="menu-item">
+                <span class="icon">⭐</span>
+                <span class="text">Success Stories</span>
+            </a>
+            <a href="/companies" class="menu-item">
+                <span class="icon">🏢</span>
+                <span class="text">Company Spotlight</span>
+            </a>
+            <div class="menu-divider"></div>
+            <a href="/profile" class="menu-item">
+                <span class="icon">👤</span>
+                <span class="text">My Profile</span>
+            </a>
+            <a href="/settings" class="menu-item">
+                <span class="icon">⚙️</span>
+                <span class="text">Settings</span>
+            </a>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+            <span>🚪</span>
+            <span>Logout</span>
+        </button>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Create Post Button -->
+    <button class="create-post-btn" onclick="openCreatePost()" title="Create Post">
+        +
+    </button>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-button" title="Chat with us">
+        💬
+    </button>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="header">
+            <h1>A.L.I.E.N</h1>
+            <p>Community Success Stories</p>
+        </div>
+
+        <!-- Posts Feed -->
+        <div class="posts-feed" id="postsFeed">
+            <!-- Posts will be loaded here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // Hamburger and Sidebar Toggle
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Logout Function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/welcome';
+            }
+        }
+
+        // Open Create Post Page
+        function openCreatePost() {
+            window.location.href = '/pages/newPost.html';
+        }
+
+        // Load Posts from Backend
+        async function loadPosts() {
+            try {
+                // Replace with your actual API endpoint
+                const response = await fetch('/api/posts', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load posts');
+                }
+
+                const posts = await response.json();
+                displayPosts(posts);
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                displayEmptyState();
+            }
+        }
+
+        // Display Posts
+        function displayPosts(posts) {
+            const postsFeed = document.getElementById('postsFeed');
+            postsFeed.innerHTML = '';
+
+            if (!posts || posts.length === 0) {
+                displayEmptyState();
+                return;
+            }
+
+            // Sort posts by newest first (assuming posts have a timestamp or createdAt field)
+            posts.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+            posts.forEach(post => {
+                const postCard = createPostCard(post);
+                postsFeed.appendChild(postCard);
+            });
+        }
+
+        // Create Post Card Element
+        function createPostCard(post) {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            
+            const timeAgo = getTimeAgo(post.createdAt);
+            const initials = getInitials(post.username);
+            
+            card.innerHTML = `
+                <div class="post-header">
+                    <div class="post-author">
+                        <div class="author-avatar">${initials}</div>
+                        <div class="author-info">
+                            <h3>${escapeHtml(post.username)}</h3>
+                            <span class="post-time">${timeAgo}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    ${escapeHtml(post.description)}
+                </div>
+                <div class="post-actions">
+                    <button class="like-btn" onclick="toggleLike(${post.postId}, this)">
+                        <span class="like-icon">♥</span>
+                        <span class="like-count">${post.likes || 0}</span>
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Display Empty State
+        function displayEmptyState() {
+            const postsFeed = document.getElementById('postsFeed');
+            postsFeed.innerHTML = `
+                <div class="empty-state">
+                    <h2>No Posts Yet</h2>
+                    <p>Be the first to share your success story with the community!</p>
+                </div>
+            `;
+        }
+
+        // Toggle Like
+        async function toggleLike(postId, button) {
+            try {
+                const likeCount = button.querySelector('.like-count');
+                const currentLikes = parseInt(likeCount.textContent);
+                const isLiked = button.classList.contains('liked');
+
+                // Optimistic UI update
+                button.classList.toggle('liked');
+                likeCount.textContent = isLiked ? currentLikes - 1 : currentLikes + 1;
+
+                // Send to backend
+                const response = await fetch('/api/posts/like', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        postId: postId,
+                        action: isLiked ? 'unlike' : 'like'
+                    })
+                });
+
+                if (!response.ok) {
+                    // Revert on error
+                    button.classList.toggle('liked');
+                    likeCount.textContent = currentLikes;
+                    throw new Error('Failed to update like');
+                }
+            } catch (error) {
+                console.error('Error toggling like:', error);
+            }
+        }
+
+        // Helper Functions
+        function getInitials(username) {
+            if (!username) return '?';
+            const words = username.trim().split(' ');
+            if (words.length >= 2) {
+                return (words[0][0] + words[1][0]).toUpperCase();
+            }
+            return username.substring(0, 2).toUpperCase();
+        }
+
+        function getTimeAgo(timestamp) {
+            if (!timestamp) return 'Just now';
+            
+            const now = new Date();
+            const postTime = new Date(timestamp);
+            const diffMs = now - postTime;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return postTime.toLocaleDateString();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load posts on page load
+        window.addEventListener('load', () => {
+            loadPosts();
+        });
+    </script>
+</body>
+</html>
