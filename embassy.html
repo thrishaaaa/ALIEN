@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embassy Locations - A.L.I.E.N</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e8e6e1;
+            min-height: 100vh;
+            padding: 50px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Alien floating watermarks */
+        .alien-watermark {
+            position: fixed;
+            font-size: 150px;
+            opacity: 0.03;
+            pointer-events: none;
+            user-select: none;
+            animation: float 18s infinite ease-in-out;
+            z-index: 0;
+        }
+
+        .alien-watermark:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .alien-watermark:nth-child(2) {
+            top: 70%;
+            right: 10%;
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-25px); }
+        }
+
+        .container {
+            max-width: 1300px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .header {
+           font-size: 14px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+
+        .header h1 {
+             font-size: 48px;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .country-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .country-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .country-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.3);
+        }
+
+        .country-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .country-card h2 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .country-card p {
+            color: #4a5568;
+            font-size: 1.05rem;
+            margin-bottom: 25px;
+        }
+
+        .explore-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .explore-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .explore-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .explore-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            .country-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Alien Watermarks -->
+    <div class="alien-watermark">👽</div>
+    <div class="alien-watermark">👽</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🪪 Embassy Locations</h1>
+            <p>Find Indian Embassies and Consulates Around the World</p>
+        </div>
+
+        <div class="countries-grid">
+            <div class="country-card" onclick="window.location.href='/pages/uk.html'">
+                <div class="country-icon">🇬🇧</div>
+                <h2>United Kingdom</h2>
+                <p>5 states with embassy services</p>
+                <button class="explore-btn">Explore Locations</button>
+            </div>
+
+            <div class="country-card" onclick="window.location.href='/pages/germany.html'">
+                <div class="country-icon">🇩🇪</div>
+                <h2>Germany</h2>
+                <p>5 states with embassy services</p>
+                <button class="explore-btn">Explore Locations</button>
+            </div>
+
+            <div class="country-card" onclick="window.location.href='/pages/australia.html'">
+                <div class="country-icon">🇦🇺</div>
+                <h2>Australia</h2>
+                <p>5 states with embassy services</p>
+                <button class="explore-btn">Explore Locations</button>
+            </div>
+
+            <div class="country-card" onclick="window.location.href='/pages/canada.html'">
+                <div class="country-icon">🇨🇦</div>
+                <h2>Canada</h2>
+                <p>5 states with embassy services</p>
+                <button class="explore-btn">Explore Locations</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ripple animation for button clicks
+        document.querySelectorAll('.explore-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                const rect = this.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.background = 'rgba(255,255,255,0.4)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+                
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to { transform: scale(4); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

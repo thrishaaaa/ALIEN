@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Germany Embassy Locations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .state-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .state-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .state-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .state-card h3 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .state-card p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .embassy-count {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 50px auto;
+            border-radius: 25px;
+            padding: 40px;
+            position: relative;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 2rem;
+            color: #999;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .modal-header h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .modal-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .embassy-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .embassy-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .embassy-item h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .contact-detail strong {
+            color: #667eea;
+            min-width: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .states-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+                margin: 20px auto;
+            }
+
+            .modal-header h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='/pages/embassy.html'">← Back to Countries</button>
+        
+        <div class="header">
+            <h1>🇩🇪 Germany</h1>
+            <p>Indian Embassy & Consulate Locations</p>
+        </div>
+
+        <div class="states-grid">
+            <div class="state-card" onclick="openModal('berlin')">
+                <h3>Berlin</h3>
+                <p>Capital city with main embassy services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('munich')">
+                <h3>Munich</h3>
+                <p>Consular services for Bavaria</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('frankfurt')">
+                <h3>Frankfurt</h3>
+                <p>Financial hub consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('hamburg')">
+                <h3>Hamburg</h3>
+                <p>Northern Germany consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('stuttgart')">
+                <h3>Stuttgart</h3>
+                <p>Baden-Württemberg consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Berlin Modal -->
+    <div id="berlin" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('berlin')">&times;</span>
+            <div class="modal-header">
+                <h2>Berlin Embassies</h2>
+                <p>Indian diplomatic missions in Berlin</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Embassy of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Tiergartenstrasse 17, 10785 Berlin</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 30 257 950</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>info.berlin@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Consular Section</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Tiergartenstrasse 17, 10785 Berlin</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 30 257 95 120</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cons.berlin@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Visa Services Centre</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Kurfürstendamm 54, 10707 Berlin</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 30 257 95 150</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>visa.berlin@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Munich Modal -->
+    <div id="munich" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('munich')">&times;</span>
+            <div class="modal-header">
+                <h2>Munich Embassies</h2>
+                <p>Indian consular services in Munich</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Consulate General of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Widenmayerstrasse 15, 80538 Munich</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 89 210 239 0</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cgmunich@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Passport Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Widenmayerstrasse 15, 80538 Munich</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 89 210 239 20</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>passport.munich@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Citizen Services Office</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Maximilianstrasse 28, 80539 Munich</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 89 210 239 40</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>citizen.munich@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frankfurt Modal -->
+    <div id="frankfurt" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('frankfurt')">&times;</span>
+            <div class="modal-header">
+                <h2>Frankfurt Embassies</h2>
+                <p>Indian consular services in Frankfurt</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Consulate General</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Friedrich-Ebert-Anlage 26, 60325 Frankfurt</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 69 153 0050</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cgfrankfurt@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Document Attestation</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Friedrich-Ebert-Anlage 26, 60325 Frankfurt</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 69 153 0055</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>attestation.frankfurt@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Visa Application Centre</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Mainzer Landstrasse 46, 60325 Frankfurt</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 69 153 0060</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>visa.frankfurt@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hamburg Modal -->
+    <div id="hamburg" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('hamburg')">&times;</span>
+            <div class="modal-header">
+                <h2>Hamburg Embassies</h2>
+                <p>Indian consular services in Hamburg</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Honorary Consulate of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Beim Alten Gaswerk 3, 22761 Hamburg</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 40 338 036 0</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>hamburg@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Community Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Beim Alten Gaswerk 3, 22761 Hamburg</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 40 338 036 10</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>community.hamburg@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Travel Document Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Neuer Wall 46, 20354 Hamburg</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 40 338 036 20</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>travel.hamburg@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stuttgart Modal -->
+    <div id="stuttgart" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('stuttgart')">&times;</span>
+            <div class="modal-header">
+                <h2>Stuttgart Embassies</h2>
+                <p>Indian consular services in Stuttgart</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Indian Consular Office</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Königstrasse 26, 70173 Stuttgart</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 711 222 0880</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>stuttgart@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Administrative Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Königstrasse 26, 70173 Stuttgart</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 711 222 0885</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>admin.stuttgart@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Emergency Consular Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Eberhardstrasse 61, 70173 Stuttgart</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+49 711 222 0890</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>emergency.stuttgart@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target === modals[i]) {
+                    modals[i].style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

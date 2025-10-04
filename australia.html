@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australia Embassy Locations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .state-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .state-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .state-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .state-card h3 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .state-card p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .embassy-count {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 50px auto;
+            border-radius: 25px;
+            padding: 40px;
+            position: relative;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 2rem;
+            color: #999;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .modal-header h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .modal-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .embassy-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .embassy-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .embassy-item h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .contact-detail strong {
+            color: #667eea;
+            min-width: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .states-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+                margin: 20px auto;
+            }
+
+            .modal-header h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='/pages/embassy.html'">← Back to Countries</button>
+        
+        <div class="header">
+            <h1>🇦🇺 Australia</h1>
+            <p>Indian Embassy & Consulate Locations</p>
+        </div>
+
+        <div class="states-grid">
+            <div class="state-card" onclick="openModal('canberra')">
+                <h3>Canberra</h3>
+                <p>Capital city with main embassy services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('sydney')">
+                <h3>Sydney</h3>
+                <p>NSW consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('melbourne')">
+                <h3>Melbourne</h3>
+                <p>Victoria consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('perth')">
+                <h3>Perth</h3>
+                <p>Western Australia consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('brisbane')">
+                <h3>Brisbane</h3>
+                <p>Queensland consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canberra Modal -->
+    <div id="canberra" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('canberra')">&times;</span>
+            <div class="modal-header">
+                <h2>Canberra Embassies</h2>
+                <p>Indian diplomatic missions in Canberra</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ High Commission of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>3-5 Moonah Place, Yarralumla, ACT 2600</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 2 6273 3999</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>info.canberra@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Consular Division</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>3-5 Moonah Place, Yarralumla, ACT 2600</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 2 6273 3900</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cons.canberra@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Visa Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Unit 1, 40 Brisbane Avenue, Barton ACT 2600</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 2 6273 3910</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>visa.canberra@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sydney Modal -->
+    <div id="sydney" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('sydney')">&times;</span>
+            <div class="modal-header">
+                <h2>Sydney Embassies</h2>
+                <p>Indian consular services in Sydney</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Consulate General of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Level 21, 447 Kent Street, Sydney NSW 2000</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 2 9223 9500</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cgsydney@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Passport Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Level 21, 447 Kent Street, Sydney NSW 2000</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 2 9223 9510</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>passport.sydney@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Citizen Services Centre</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Level 20, 447 Kent Street, Sydney NSW 2000</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 2 9223 9520</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>citizen.sydney@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Melbourne Modal -->
+    <div id="melbourne" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('melbourne')">&times;</span>
+            <div class="modal-header">
+                <h2>Melbourne Embassies</h2>
+                <p>Indian consular services in Melbourne</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Consulate General of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>13 Munro Street, Coburg VIC 3058</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 3 9384 0141</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cgmelbourne@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Document Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>13 Munro Street, Coburg VIC 3058</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 3 9384 0145</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>docs.melbourne@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Visa Application Centre</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Level 1, 265 Collins Street, Melbourne VIC 3000</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 3 9384 0150</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>visa.melbourne@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Perth Modal -->
+    <div id="perth" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('perth')">&times;</span>
+            <div class="modal-header">
+                <h2>Perth Embassies</h2>
+                <p>Indian consular services in Perth</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Consulate General of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>21 Stirling Highway, Nedlands WA 6009</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 8 9389 2700</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cgperth@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Community Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>21 Stirling Highway, Nedlands WA 6009</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 8 9389 2705</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>community.perth@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Passport & Travel Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Level 2, 863 Hay Street, Perth WA 6000</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 8 9389 2710</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>travel.perth@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Brisbane Modal -->
+    <div id="brisbane" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('brisbane')">&times;</span>
+            <div class="modal-header">
+                <h2>Brisbane Embassies</h2>
+                <p>Indian consular services in Brisbane</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Honorary Consulate of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Level 5, 300 Adelaide Street, Brisbane QLD 4000</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 7 3221 0123</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>brisbane@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Administrative Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Level 5, 300 Adelaide Street, Brisbane QLD 4000</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 7 3221 0125</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>admin.brisbane@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Emergency Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>Level 4, 300 Adelaide Street, Brisbane QLD 4000</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+61 7 3221 0130</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>emergency.brisbane@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target === modals[i]) {
+                    modals[i].style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

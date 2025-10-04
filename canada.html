@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Embassy Locations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .state-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .state-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .state-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .state-card h3 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .state-card p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .embassy-count {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 50px auto;
+            border-radius: 25px;
+            padding: 40px;
+            position: relative;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 2rem;
+            color: #999;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .modal-header h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .modal-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .embassy-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .embassy-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .embassy-item h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .contact-detail strong {
+            color: #667eea;
+            min-width: 80px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .states-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+                margin: 20px auto;
+            }
+
+            .modal-header h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="window.location.href='/pages/embassy.html'">← Back to Countries</button>
+        
+        <div class="header">
+            <h1>🇨🇦 Canada</h1>
+            <p>Indian Embassy & Consulate Locations</p>
+        </div>
+
+        <div class="states-grid">
+            <div class="state-card" onclick="openModal('ottawa')">
+                <h3>Ottawa</h3>
+                <p>Capital city with main embassy services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('toronto')">
+                <h3>Toronto</h3>
+                <p>Ontario consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('vancouver')">
+                <h3>Vancouver</h3>
+                <p>British Columbia consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('calgary')">
+                <h3>Calgary</h3>
+                <p>Alberta consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+
+            <div class="state-card" onclick="openModal('montreal')">
+                <h3>Montreal</h3>
+                <p>Quebec consular services</p>
+                <span class="embassy-count">3 Embassy Contacts</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ottawa Modal -->
+    <div id="ottawa" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('ottawa')">&times;</span>
+            <div class="modal-header">
+                <h2>Ottawa Embassies</h2>
+                <p>Indian diplomatic missions in Ottawa</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ High Commission of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>10 Springfield Road, Ottawa, ON K1M 1C9</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 613 744 3751</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>hoc.ottawa@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Consular Wing</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>10 Springfield Road, Ottawa, ON K1M 1C9</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 613 744 3752</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cons.ottawa@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Visa Services Division</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>340 Albert Street, Suite 400, Ottawa, ON K1R 7Y6</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 613 744 3760</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>visa.ottawa@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toronto Modal -->
+    <div id="toronto" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('toronto')">&times;</span>
+            <div class="modal-header">
+                <h2>Toronto Embassies</h2>
+                <p>Indian consular services in Toronto</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Consulate General of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>365 Bloor Street East, Suite 501, Toronto, ON M4W 3L4</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 416 960 0751</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cgtoronto@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Passport & OCI Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>365 Bloor Street East, Suite 501, Toronto, ON M4W 3L4</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 416 960 0755</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>passport.toronto@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Community Services Centre</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>2 Bloor Street West, Suite 3400, Toronto, ON M4W 3E2</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 416 960 0760</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>community.toronto@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vancouver Modal -->
+    <div id="vancouver" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('vancouver')">&times;</span>
+            <div class="modal-header">
+                <h2>Vancouver Embassies</h2>
+                <p>Indian consular services in Vancouver</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Consulate General of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>325 Howe Street, Suite 201, Vancouver, BC V6C 1Z7</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 604 662 8811</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cgvancouver@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Consular Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>325 Howe Street, Suite 201, Vancouver, BC V6C 1Z7</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 604 662 8815</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cons.vancouver@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Document Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>595 Burrard Street, Suite 1100, Vancouver, BC V7X 1L4</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 604 662 8820</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>docs.vancouver@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calgary Modal -->
+    <div id="calgary" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('calgary')">&times;</span>
+            <div class="modal-header">
+                <h2>Calgary Embassies</h2>
+                <p>Indian consular services in Calgary</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Honorary Consulate of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>510 5th Street SW, Suite 100, Calgary, AB T2P 3S2</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 403 263 5115</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>calgary@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Support Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>510 5th Street SW, Suite 100, Calgary, AB T2P 3S2</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 403 263 5120</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>support.calgary@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Travel & Emergency Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>715 5th Avenue SW, Suite 900, Calgary, AB T2P 2X6</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 403 263 5125</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>emergency.calgary@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Montreal Modal -->
+    <div id="montreal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('montreal')">&times;</span>
+            <div class="modal-header">
+                <h2>Montreal Embassies</h2>
+                <p>Indian consular services in Montreal</p>
+            </div>
+            
+            <div class="embassy-item">
+                <h3>🏛️ Consulate General of India</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>2015 Rue Drummond, Montreal, QC H3G 1W7</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 514 937 7772</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>cgmontreal@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>📋 Citizen Services</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>2015 Rue Drummond, Montreal, QC H3G 1W7</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 514 937 7775</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>citizen.montreal@mea.gov.in</span>
+                </div>
+            </div>
+
+            <div class="embassy-item">
+                <h3>🎫 Visa & Immigration Office</h3>
+                <div class="contact-detail">
+                    <strong>Address:</strong>
+                    <span>1250 Boulevard René-Lévesque Ouest, Montreal, QC H3B 4W8</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Phone:</strong>
+                    <span>+1 514 937 7780</span>
+                </div>
+                <div class="contact-detail">
+                    <strong>Email:</strong>
+                    <span>visa.montreal@mea.gov.in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target === modals[i]) {
+                    modals[i].style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
