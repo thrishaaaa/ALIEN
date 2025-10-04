@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -163,13 +163,7 @@
             transform: translateY(0);
         }
 
-        .join-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        /* Message Preview Section */
+        /* Preview Section */
         .preview-section {
             margin-top: 2rem;
             padding-top: 2rem;
@@ -214,34 +208,6 @@
             margin-top: 0.3rem;
         }
 
-        .loading {
-            text-align: center;
-            color: #5a6c7d;
-            font-size: 1.1rem;
-            padding: 1rem;
-        }
-
-        /* Status Messages */
-        .status-message {
-            text-align: center;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             .nav-links {
@@ -264,24 +230,18 @@
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav>
         <div class="nav-container">
             <div class="logo">💬 ConnectHub</div>
             <ul class="nav-links">
-                <li><a th:href="@{/home}">Home</a></li>
-                <li><a th:href="@{/community}" class="active">Community</a></li>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#community" class="active">Community</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Main Container -->
     <div class="container">
         <div class="community-card">
-            <!-- Status Message -->
-            <div id="statusMessage" style="display: none;"></div>
-
-            <!-- Community Header -->
             <div class="community-header">
                 <h1 class="community-title">Tech Career Community</h1>
                 <p class="community-description">
@@ -291,147 +251,48 @@
                 </p>
             </div>
 
-            <!-- Member Count -->
             <div class="stats-container">
                 <span class="member-icon">👥</span>
-                <span class="member-count" id="memberCount">Loading...</span>
+                <span class="member-count">1,245 members have joined</span>
             </div>
 
-            <!-- Join Button -->
             <button class="join-btn" id="joinBtn">
                 🚀 Join Community
             </button>
 
-            <!-- Message Preview Section -->
             <div class="preview-section">
-                <h3 class="preview-title">📬 Recent Community Activity</h3>
+                <h3 class="preview-title">🔥 Recent Activity</h3>
                 <div id="messagePreview">
-                    <div class="loading">Loading recent messages...</div>
+                    <div class="message-preview">
+                        <div class="message-author">SarahK</div>
+                        <div class="message-text">Anyone else applying for the new SWE role at Innovatech? I'm stuck on the system design challenge.</div>
+                        <div class="message-time">1 minute ago</div>
+                    </div>
+                    <div class="message-preview">
+                        <div class="message-author">Dev_Ops_Max</div>
+                        <div class="message-text">Just finished my AWS Solutions Architect certification! Feeling great. What should I tackle next?</div>
+                        <div class="message-time">4 hours ago</div>
+                    </div>
+                    <div class="message-preview">
+                        <div class="message-author">NewGrad2025</div>
+                        <div class="message-text">Any tips for negotiating a starting salary as a junior developer?</div>
+                        <div class="message-time">1 day ago</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        // Configuration
-        const API_BASE_URL = /*[[@{/api}]]*/ '/api'; // Thymeleaf will replace with proper context path
-        let userId = localStorage.getItem('userId') || 'user_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('userId', userId);
-
-        // DOM Elements
+    <script>
         const joinBtn = document.getElementById('joinBtn');
-        const memberCount = document.getElementById('memberCount');
-        const messagePreview = document.getElementById('messagePreview');
-        const statusMessage = document.getElementById('statusMessage');
-
-        // Show status message
-        function showStatus(message, type) {
-            statusMessage.textContent = message;
-            statusMessage.className = `status-message status-${type}`;
-            statusMessage.style.display = 'block';
-            setTimeout(() => {
-                statusMessage.style.display = 'none';
-            }, 3000);
-        }
-
-        // Fetch member count
-        async function fetchMemberCount() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/community/members/count`);
-                const data = await response.json();
-                memberCount.textContent = `${data.count} members have joined`;
-            } catch (error) {
-                memberCount.textContent = 'Unable to load member count';
-                console.error('Error fetching member count:', error);
-            }
-        }
-
-        // Fetch recent messages preview
-        async function fetchMessagePreview() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/community/messages/preview`);
-                const data = await response.json();
-                
-                if (data.messages && data.messages.length > 0) {
-                    messagePreview.innerHTML = data.messages.map(msg => `
-                        <div class="message-preview">
-                            <div class="message-author">${msg.author}</div>
-                            <div class="message-text">${msg.text}</div>
-                            <div class="message-time">${formatTime(msg.timestamp)}</div>
-                        </div>
-                    `).join('');
-                } else {
-                    messagePreview.innerHTML = '<div class="loading">No messages yet. Be the first to join and chat!</div>';
-                }
-            } catch (error) {
-                messagePreview.innerHTML = '<div class="loading">Unable to load message preview</div>';
-                console.error('Error fetching message preview:', error);
-            }
-        }
-
-        // Format timestamp
-        function formatTime(timestamp) {
-            const date = new Date(timestamp);
-            const now = new Date();
-            const diff = now - date;
-            const minutes = Math.floor(diff / 60000);
-            
-            if (minutes < 1) return 'Just now';
-            if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-            const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-            return date.toLocaleDateString();
-        }
-
-        // Join community
-        async function joinCommunity() {
-            joinBtn.disabled = true;
-            joinBtn.textContent = 'Joining...';
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/community/join`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        userId: userId,
-                        username: 'User_' + userId.substr(-4)
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    showStatus('Successfully joined! Redirecting to chat room...', 'success');
-                    setTimeout(() => {
-                        window.location.href = /*[[@{/chat-room}]]*/ '/chat-room';
-                    }, 1500);
-                } else {
-                    throw new Error(data.message || 'Failed to join community');
-                }
-            } catch (error) {
-                showStatus(error.message, 'error');
-                joinBtn.disabled = false;
-                joinBtn.textContent = '🚀 Join Community';
-                console.error('Error joining community:', error);
-            }
-        }
-
-        // Event Listeners
-        joinBtn.addEventListener('click', joinCommunity);
-
-        // Initialize
-        fetchMemberCount();
-        fetchMessagePreview();
-
-        // Auto-refresh data every 30 seconds
-        setInterval(() => {
-            fetchMemberCount();
-            fetchMessagePreview();
-        }, 30000);
-        /*]]>*/
+        
+        // Redirect to chat room when join button is clicked
+        joinBtn.addEventListener('click', function() {
+            // Change to your actual chat room page URL
+            // For Spring Boot with Thymeleaf, use: window.location.href = '/chat-room';
+            // For testing locally, you can use a relative path or full URL
+            window.location.href = 'live_chat.html'; // Change this to your actual chat room page path
+        });
     </script>
 </body>
 </html>
