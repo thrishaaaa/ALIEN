@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - A.L.I.E.N</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:  #e8e6e1;;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            letter-spacing: 0.3em;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 60px 40px;
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .welcome-text h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .welcome-text p {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.8;
+        }
+
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .role-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .role-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+
+        .role-card:hover::before {
+            opacity: 1;
+        }
+
+        .role-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .role-card:hover .role-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .role-title {
+            color: #2c3e50;
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .role-description {
+            color: #666;
+            font-size: 1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .role-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .role-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-tag {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .role-card:hover .feature-tag {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+            color: #999;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+                letter-spacing: 0.2em;
+            }
+
+            .header p {
+                font-size: 1.1em;
+            }
+
+            .welcome-text h2 {
+                font-size: 1.5em;
+            }
+
+            .button-container {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">👽</div>
+            <h1>A.L.I.E.N</h1>
+            <p>Accelerating Limitless Immigration Excellence Network</p>
+        </div>
+
+        <div class="content">
+            <div class="welcome-text">
+                <h2>Welcome to Your O-1 Visa Journey</h2>
+                <p>Choose your path to excellence. Whether you're seeking opportunities or providing them, we're here to help you achieve extraordinary success.</p>
+            </div>
+
+            <div class="button-container">
+                <!-- User/Employee Card -->
+                <div class="role-card" onclick="navigateToPage('/pages/explore.html')">
+                    <div class="role-icon">👤</div>
+                    <h3 class="role-title">I'm a User</h3>
+                    <p class="role-description">
+                        Explore courses, internships, and job opportunities tailored for O-1 visa applicants. Build your profile and showcase your extraordinary abilities.
+                    </p>
+                    <button class="role-button">Explore Opportunities</button>
+                    <div class="features">
+                        <span class="feature-tag">📚 Technical Courses</span>
+                        <span class="feature-tag">💼 Internships</span>
+                        <span class="feature-tag">🎯 Job Openings</span>
+                        <span class="feature-tag">🏆 Build Portfolio</span>
+                    </div>
+                </div>
+
+                <!-- Job Provider Card -->
+                <div class="role-card" onclick="navigateToPage('/pages/jobportal.html')">
+                    <div class="role-icon">🏢</div>
+                    <h3 class="role-title">I'm a Job Provider</h3>
+                    <p class="role-description">
+                        Post job openings, internships, and courses. Connect with talented individuals seeking O-1 visa sponsorship opportunities.
+                    </p>
+                    <button class="role-button">Post Opportunities</button>
+                    <div class="features">
+                        <span class="feature-tag">📝 Post Jobs</span>
+                        <span class="feature-tag">🎓 Offer Courses</span>
+                        <span class="feature-tag">👥 Find Talent</span>
+                        <span class="feature-tag">🤝 Sponsor Visas</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-note">
+                <p>Not sure which option to choose? Both paths offer unique opportunities to contribute to and benefit from our community of excellence.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function navigateToPage(path) {
+            window.location.href = path;
+        }
+
+        // Add hover sound effect (optional enhancement)
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+        });
+    </script>
+</body>
+</html>
